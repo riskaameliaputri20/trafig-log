@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use App\Models\TrafficLog;
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
@@ -22,7 +21,6 @@ class ParseApacheLog extends Command
             return 1;
         }
 
-        // Gunakan disk "local" agar tersimpan di storage/app
         $disk = Storage::disk('local');
         $stateFileName = 'parser_state_' . md5($filePath) . '.txt';
         $lastPosition = 0;
@@ -42,31 +40,29 @@ class ParseApacheLog extends Command
 
         $newLinesCount = 0;
 
-        $extensionsToIgnore = [
-            '.css',
-            '.js',
-            '.png',
-            '.jpg',
-            '.jpeg',
-            '.gif',
-            '.svg',
-            '.woff',
-            '.woff2',
-            '.ico'
-        ];
+        // Abaikan file statis seperti CSS, JS, gambar, dll.
+        $ignorePattern = '/\.(css|js|png|jpg|jpeg|gif|svg|woff|woff2|ico|json)(\?.*)?$/i';
 
         while (($line = fgets($handle)) !== false) {
             $line = trim($line);
-            if ($line === '')
+            if ($line === '') {
                 continue;
+            }
 
-            $newLinesCount++;
             $pattern = '/^(\S+) \S+ \S+ \[([^\]]+)\] "(\S+) (\S+) \S+" (\d{3}) (\d+|-) "(.*?)" "(.*?)"$/';
 
             if (preg_match($pattern, $line, $matches)) {
                 $requestUri = strtolower($matches[4]);
+                $parsedUrl = parse_url($requestUri);
+                $path = $parsedUrl['path'] ?? $requestUri;
 
-                if (Str::endsWith($requestUri, $extensionsToIgnore)) {
+                // ✅ Abaikan file statis
+                if (preg_match($ignorePattern, $path)) {
+                    continue;
+                }
+
+                // ✅ Abaikan URL yang mengarah ke dashboard-admin
+                if (preg_match('#^/dashboard-admin(/|$)#i', $path)) {
                     continue;
                 }
 
@@ -91,6 +87,8 @@ class ParseApacheLog extends Command
                         'user_agent' => $matches[8],
                     ]
                 );
+
+                $newLinesCount++;
             }
         }
 

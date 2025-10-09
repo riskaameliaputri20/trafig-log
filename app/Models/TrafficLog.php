@@ -11,9 +11,9 @@ class TrafficLog extends Model
         'access_time',
         'request_method',
         'request_uri',
+        'user_agent',
         'status_code',
         'response_size',
         'referrer',
-        'user_agent'
     ];
 }

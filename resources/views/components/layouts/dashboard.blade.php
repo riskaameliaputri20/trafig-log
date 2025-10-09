@@ -21,6 +21,7 @@
             rel="shortcut icon"
             href="dashboard/assets/images/favicon.ico"
         />
+        @stack('style')
 
         <!-- Layout config Js -->
         <x-script src="dashboard/assets/js/layout.js"></x-script>
@@ -36,6 +37,8 @@
             rel="stylesheet"
             type="text/css"
         />
+
+
         <!-- App Css-->
         <x-link
             href="dashboard/assets/css/app.min.css"
@@ -130,6 +133,12 @@
         <x-script src="dashboard/assets/libs/feather-icons/feather.min.js"></x-script>
         <x-script src="dashboard/assets/js/pages/plugins/lord-icon-2.1.0.js"></x-script>
         <x-script src="dashboard/assets/js/plugins.js"></x-script>
+
+        {{-- 1. jQuery dulu --}}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+
+        @stack('script')
 
         <!-- App js -->
         <x-script src="dashboard/assets/js/app.js"></x-script>

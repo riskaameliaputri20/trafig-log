@@ -21,7 +21,7 @@ Route::name('landing.')->group(function () {
 });
 
 // Dashboard Page
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('dashboard-admin')->name('dashboard.')->group(function () {
 
     Route::controller(DashboardController::class)->group(function () {
         Route::get('/', 'index')->name('index');
