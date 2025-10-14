@@ -8,8 +8,9 @@ use App\Http\Controllers\Admin\DashboardController;
 // Authentication
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'login'])->name('login');
-    Route::get('/register', [AuthController::class, 'register'])->name('register');
+    Route::post('/login', [AuthController::class, 'loginProcess'])->name('loginProcess');
 });
+Route::get('/logout' , [AuthController::class , 'logout'])->middleware('auth')->name('logout');
 
 // Landing Page
 Route::name('landing.')->group(function () {
@@ -21,7 +22,7 @@ Route::name('landing.')->group(function () {
 });
 
 // Dashboard Page
-Route::prefix('dashboard-admin')->name('dashboard.')->group(function () {
+Route::prefix('dashboard-admin')->middleware('auth')->name('dashboard.')->group(function () {
 
     Route::controller(DashboardController::class)->group(function () {
         Route::get('/', 'index')->name('index');
