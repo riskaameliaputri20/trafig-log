@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->call(function () {
             Log::info('Scheduler dijalankan pada: ' . now('Asia/Makassar'));
         })->everyMinute();
+
     })
     ->withMiddleware(function (Middleware $middleware): void {
         //

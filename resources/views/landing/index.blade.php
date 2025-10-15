@@ -36,13 +36,10 @@
                                 data-delay="1s"
                             >
                                 <a
-                                    href="shop-grid.html"
+                                    href="/blogs"
                                     class="theme-btn"
-                                >Shop Now<i class="fas fa-arrow-right"></i></a>
-                                <a
-                                    href="about.html"
-                                    class="theme-btn theme-btn2"
-                                >Learn More<i class="fas fa-arrow-right"></i></a>
+                                >Blogs<i class="fas fa-arrow-right"></i></a>
+
                             </div>
                         </div>
                     </div>

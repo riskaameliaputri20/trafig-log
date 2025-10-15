@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Carbon\Carbon;
 use App\Models\TrafficLog;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class ParseApacheLog extends Command
@@ -98,6 +99,7 @@ class ParseApacheLog extends Command
         $disk->put($stateFileName, $currentPosition);
 
         $this->info("Parsing selesai. {$newLinesCount} baris baru diproses. Posisi terakhir disimpan di {$currentPosition}.");
+        Log::info('Scheduler dijalankan pada: ' . now('Asia/Makassar'));
         return 0;
     }
 }

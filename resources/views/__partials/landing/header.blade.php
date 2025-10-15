@@ -4,8 +4,8 @@
         <div class="main-navigation">
             <nav class="navbar navbar-expand-lg">
                 <div class="container position-relative">
-                    <a class="navbar-brand" href="index.html">
-                        <img src="assets/img/logo/logo.png" alt="logo">
+                    <a class="navbar-brand" href="/">
+                        <x-img src="assets/img/logo/logo.png" alt="logo" />
                     </a>
                     <div class="mobile-menu-right">
                         <div class="mobile-menu-btn">
@@ -33,9 +33,11 @@
                                 aria-label="Close"></button>
                         </div>
                         <div class="offcanvas-body">
+
                             <ul class="navbar-nav justify-content-end flex-grow-1">
-                                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/produk">Produk</a></li>
+                                <li class="nav-item"><a class="nav-link  {{ request()->routeIs('landing.index') ? 'active' : '' }} " href="/">Home</a></li>
+                                {{-- <li class="nav-item"><a class="nav-link  {{ Str::is('products*' , request()->path()) ? 'active' : '' }} " href="/products">Produk</a></li> --}}
+                                <li class="nav-item"><a class="nav-link  {{ Str::is('blogs*' , request()->path()) ? 'active' : '' }}" href="/blogs">Blog</a></li>
                             </ul>
                             <!-- nav-right -->
                             <div class="nav-right icon">

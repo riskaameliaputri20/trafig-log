@@ -10,7 +10,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $trafik = TrafficLog::latest()->paginate(10);
+        $trafik = TrafficLog::latest('access_time')->paginate(10);
         $trafikCount = TrafficLog::count();
         $trafikCountToday = TrafficLog::whereToday('created_at')->count();
         return view('dashboard.index', [

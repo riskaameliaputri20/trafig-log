@@ -16,4 +16,8 @@ class TrafficLog extends Model
         'response_size',
         'referrer',
     ];
+
+    protected $casts = [
+        'access_time' => 'datetime',
+    ];
 }
