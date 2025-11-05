@@ -1,1 +1,17 @@
 taskschd.msc
+
+- simpan log ke database
+    - php artisan log:parse
+- create seed blog
+    -
+ - fitur yg sudah
+    - buat akun admin
+        - php artisan app:create-admin
+    - login admin
+    - login admin
+    - list blog
+    - list blog berdasarkan category
+    - detail blog
+
+    - chart untuk respon size
+    - chart untuk respon code

@@ -1,6 +1,6 @@
 @props(['title' => ''])
 <!doctype html>
-<html lang="en" data-layout="horizontal" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
+<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
     data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default"
     data-layout-width="boxed">
 
@@ -33,6 +33,7 @@
     <div id="layout-wrapper">
 
         @include('__partials.dashboard.header')
+        @include('__partials.dashboard.sidebar')
         <!-- Left Sidebar End -->
         <!-- Vertical Overlay-->
         <div class="vertical-overlay"></div>

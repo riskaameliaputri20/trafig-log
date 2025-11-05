@@ -28,6 +28,6 @@ class LoginService
             throw new \Exception("Invalid Email or Password");
         }
 
-        return redirect()->intended('/dashboard-admin');
+        return redirect()->intended('/beranda');
     }
 }

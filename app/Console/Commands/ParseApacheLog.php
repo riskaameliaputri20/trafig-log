@@ -58,14 +58,9 @@ class ParseApacheLog extends Command
                 $path = $parsedUrl['path'] ?? $requestUri;
 
                 // ✅ Abaikan file statis
-                if (preg_match($ignorePattern, $path)) {
-                    continue;
-                }
-
-                // ✅ Abaikan URL yang mengarah ke dashboard-admin
-                if (preg_match('#^/dashboard-admin(/|$)#i', $path)) {
-                    continue;
-                }
+                // if (preg_match($ignorePattern, $path)) {
+                //     continue;
+                // }
 
                 try {
                     $accessTime = Carbon::createFromFormat('d/M/Y:H:i:s O', $matches[2]);
@@ -98,7 +93,6 @@ class ParseApacheLog extends Command
 
         $disk->put($stateFileName, $currentPosition);
 
-        $this->info("Parsing selesai. {$newLinesCount} baris baru diproses. Posisi terakhir disimpan di {$currentPosition}.");
         Log::info('Scheduler dijalankan pada: ' . now('Asia/Makassar'));
         return 0;
     }

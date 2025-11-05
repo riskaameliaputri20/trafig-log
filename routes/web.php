@@ -24,14 +24,16 @@ Route::name('landing.')->group(function () {
     Route::get('/blogs', [BlogController::class, 'index'])->name('blog');
     Route::get('/blogs/category/{name}', [BlogController::class, 'category'])->name('blog.category');
     Route::get('/blogs/{slug}', [BlogController::class, 'detail'])->name('blog.detail');
-
 });
 
 // Dashboard Page
-Route::prefix('dashboard-admin')->name('dashboard.')->group(function () {
+Route::prefix('beranda')->middleware('auth')->name('dashboard.')->group(function () {
 
     Route::controller(DashboardController::class)->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::get('/user-behavior', 'userBehavior')->name('userBehavior');
+        Route::get('/error-logs', 'analyzeErrorLogs')->name('analyzeErrorLogs');
+        Route::post('/upload-file', 'uploadFile')->name('uploadFile');
+        Route::post('/remove-upload-file', 'removeFile')->name('removeFile');
     });
-
 });

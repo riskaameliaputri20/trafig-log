@@ -4,6 +4,7 @@ namespace App\View\Components\Chart;
 
 use Closure;
 use App\Models\TrafficLog;
+use App\Services\LogService;
 use Illuminate\View\Component;
 use Illuminate\Contracts\View\View;
 
@@ -22,11 +23,15 @@ class StatusCodeChart extends Component
      */
     public function render(): View|Closure|string
     {
+        $logService = new LogService();
+
+        // Ambil koleksi log dari file
+        $logs = $logService->parseLog();
+
         // Hitung jumlah berdasarkan status_code
-        $statusCounts = TrafficLog::select('status_code')
-            ->selectRaw('COUNT(*) as total')
-            ->groupBy('status_code')
-            ->pluck('total', 'status_code')
+        $statusCounts = $logs
+            ->groupBy('status_code')        // Kelompokkan berdasarkan status_code
+            ->map(fn($group) => $group->count())  // Hitung jumlah tiap status_code
             ->sortKeys();
 
         return view('components.chart.status-code-chart', [

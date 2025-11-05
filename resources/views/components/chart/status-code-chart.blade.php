@@ -11,10 +11,12 @@
             type: 'pie',
         },
         colors: [
-            '#27ae60', // 200 - Hijau Tegas
-            '#f04f26', // 300 - Kuning-Oranye Tegas
-            '#ff0019', // 400 - Oranye Gelap
-            '#6b030f' // 500 - Merah Gelap
+            '#27ae60', // Hijau
+            '#f0b426', // Kuning-oranye muda
+            '#f04f26', // Oranye tegas
+            '#ff0019', // Oranye gelap
+            '#6b030f', // Merah gelap
+            '#4b0108' // Merah tua
         ],
         labels: @json($statusCounts->keys()), // Daftar status code
         title: {

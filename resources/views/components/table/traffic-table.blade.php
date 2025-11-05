@@ -1,5 +1,5 @@
 @props([
-    'traffics' => []
+    'traffics' => [],
 ])
 
 <table id="tableTrafikLog" class="table table-bordered table-striped align-middle" style="width:100%">
@@ -17,18 +17,18 @@
         </tr>
     </thead>
     <tbody>
-        @foreach ($traffics as $trafficLog )
-        <tr>
-            <td>{{ $loop->index + 1 }}</td>
-            <td>{{ $trafficLog->ip_address }}</td>
-            <td>{{ $trafficLog->request_method }}</td>
-            <td>{{ $trafficLog->request_uri }}</td>
-            <td>{{ $trafficLog->status_code }}</td>
-            {{-- <td>{{ $trafficLog->user_agent }}</td> --}}
-            <td>{{ Number::format($trafficLog->response_size) }} KB</td>
-            {{-- <td>{{ $trafficLog->referrer }}</td> --}}
-            <td>{{ $trafficLog->access_time }}</td>
-        </tr>
+        @foreach ($traffics as $trafficLog)
+            <tr>
+                <td>{{ $loop->index + 1 }}</td>
+                <td>{{ $trafficLog['ip_address'] }}</td>
+                <td>{{ $trafficLog['request_method'] }}</td>
+                <td>{{ $trafficLog['request_uri'] }}</td>
+                <td>{{ $trafficLog['status_code'] }}</td>
+                {{-- <td>{{ $trafficLog->user_agent }}</td> --}}
+                <td>{{ Number::format($trafficLog['response_size']) }} KB</td>
+                {{-- <td>{{ $trafficLog->referrer }}</td> --}}
+                <td>{{ $trafficLog['access_time'] }}</td>
+            </tr>
         @endforeach
 
     </tbody>

@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Chart;
 
+use App\Services\LogService;
 use Closure;
 use App\Models\TrafficLog;
 use Illuminate\View\Component;
@@ -22,16 +23,16 @@ class ResponSizeChart extends Component
      */
     public function render(): View|Closure|string
     {
-        $trafficData = TrafficLog::orderBy('access_time', 'asc')->get();
+        $trafficData = (new LogService())->parseLog();
 
         $prices = $trafficData->pluck('response_size');
-        $dates = $trafficData->pluck('access_time')->map(function($time) {
+        $dates = $trafficData->pluck('access_time')->map(function ($time) {
             return \Carbon\Carbon::parse($time)->toIso8601String(); // Format ISO utk datetime chart
         });
-        return view('components.chart.respon-size-chart' , [
+        return view('components.chart.respon-size-chart', [
             'prices' => $prices,
             'dates' => $dates
 
-         ]);
+        ]);
     }
 }

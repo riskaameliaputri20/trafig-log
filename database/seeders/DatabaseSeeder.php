@@ -15,7 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->command->call('log:parse');
+
+        // Buat User Admin
+        $this->command->call('app:create-admin');
+
         // Buat kategori jika belum ada
         if (BlogCategory::count() == 0) {
             $this->command->info('Membuat 20 kategori blog...');
@@ -34,5 +37,6 @@ class DatabaseSeeder extends Seeder
 
         $this->command->newLine();
         $this->command->info("✅ Selesai membuat {$count} blog!");
+
     }
 }
