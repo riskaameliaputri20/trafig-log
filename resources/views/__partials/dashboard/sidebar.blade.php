@@ -89,9 +89,32 @@
                  </li>
                  <li class="nav-item">
                      <a class="nav-link menu-link" href="{{ route('dashboard.analyzeErrorLogs') }}">
-                         <i class="ri-bug-line"></i> <span>Error Logs</span>
+                         <i class="ri-error-warning-line"></i>
+                         <span>Error Logs</span>
                      </a>
                  </li>
+
+                 <li class="nav-item">
+                     <a class="nav-link menu-link" href="{{ route('dashboard.loginActivity') }}">
+                         <i class="ri-shield-user-line"></i>
+                         <span>Login Activity</span>
+                     </a>
+                 </li>
+
+                 <li class="nav-item">
+                     <a class="nav-link menu-link" href="{{ route('dashboard.analyzeServerPerformance') }}">
+                         <i class="ri-dashboard-line"></i>
+                         <span>Server Performance</span>
+                     </a>
+                 </li>
+
+                 <li class="nav-item">
+                     <a class="nav-link menu-link" href="{{ route('dashboard.popularEndpoints') }}">
+                         <i class="ri-git-branch-line"></i>
+                         <span>Popular Endpoint</span>
+                     </a>
+                 </li>
+
              </ul>
          </div>
          <!-- Sidebar -->

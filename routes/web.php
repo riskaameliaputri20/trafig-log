@@ -35,5 +35,8 @@ Route::prefix('beranda')->middleware('auth')->name('dashboard.')->group(function
         Route::get('/error-logs', 'analyzeErrorLogs')->name('analyzeErrorLogs');
         Route::post('/upload-file', 'uploadFile')->name('uploadFile');
         Route::post('/remove-upload-file', 'removeFile')->name('removeFile');
+        Route::get('/login-activity', 'loginActivity')->name('loginActivity');
+        Route::get('/server-performance', 'analyzeServerPerformance')->name('analyzeServerPerformance');
+        Route::get('/popular-endpoints', 'popularEndpoints')->name('popularEndpoints');
     });
 });

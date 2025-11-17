@@ -330,4 +330,80 @@ class LogService
             ];
         })->sortByDesc('total_requests')->values();
     }
+    /**
+     * 🔐 Analisis Aktivitas Login (/login)
+     */
+    public function analyzeLoginActivity(): \Illuminate\Support\Collection
+    {
+        $logs = $this->parseLog();
+
+        if ($logs->isEmpty()) {
+            return collect([
+                'total_login_requests' => 0,
+                'attempt_by_ip' => [],
+                'success_by_ip' => [],
+                'failed_by_ip' => [],
+                'timeline' => [],
+                'suspicious' => [],
+            ]);
+        }
+
+        // Ambil request yg menuju /login
+        $loginLogs = $logs->filter(function ($e) {
+            $uri = strtolower(parse_url($e['request_uri'], PHP_URL_PATH));
+            return $uri === '/login';
+        });
+
+        if ($loginLogs->isEmpty()) {
+            return collect([
+                'total_login_requests' => 0,
+                'attempt_by_ip' => [],
+                'success_by_ip' => [],
+                'failed_by_ip' => [],
+                'timeline' => [],
+                'suspicious' => [],
+            ]);
+        }
+
+        // --- Login Sukses ---
+        $success = $loginLogs->filter(fn($e) => in_array($e['status_code'], [200, 302]));
+
+        // --- Login Gagal (401 / 403 / 404) ---
+        $failed = $loginLogs->filter(fn($e) => in_array($e['status_code'], [400, 401, 403, 404, 429]));
+
+        // --- Kelompokkan IP ---
+        $attemptByIp = $loginLogs->groupBy('ip_address')->map->count()->sortDesc();
+        $successByIp = $success->groupBy('ip_address')->map->count()->sortDesc();
+        $failedByIp = $failed->groupBy('ip_address')->map->count()->sortDesc();
+
+        // --- Timeline Per Jam ---
+        $timeline = $loginLogs->groupBy(fn($e) => $e['access_time']->format('Y-m-d H:00'))
+            ->map->count()
+            ->sortKeys();
+
+        // --- Deteksi Suspicious ---
+        $suspicious = collect();
+
+        foreach ($failedByIp as $ip => $failCount) {
+            if ($failCount >= 10) {
+                $recentFail = $failed->where('ip_address', $ip)->sortByDesc('access_time')->first();
+                $suspicious->push([
+                    'ip' => $ip,
+                    'reason' => 'Multiple Failed Login Attempts',
+                    'fail_count' => $failCount,
+                    'last_attempt' => $recentFail['access_time'],
+                ]);
+            }
+        }
+
+        return collect([
+            'total_login_requests' => $loginLogs->count(),
+            'attempt_by_ip' => $attemptByIp,
+            'success_by_ip' => $successByIp,
+            'failed_by_ip' => $failedByIp,
+            'timeline' => $timeline,
+            'suspicious' => $suspicious,
+            'raw' => $loginLogs, // untuk debugging atau kebutuhan tabel
+        ]);
+    }
 }
