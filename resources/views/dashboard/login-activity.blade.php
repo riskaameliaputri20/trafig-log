@@ -47,7 +47,13 @@
             </div>
         </div>
     </div>
-
+    <div class="row">
+        <div class="col-12 mb-2 text-end">
+            <a href="{{ route('dashboard.export.login-activity') }}" class="btn btn-success">
+                Export Laporan
+            </a>
+        </div>
+    </div>
 
     {{-- TOP LOGIN ATTEMPT --}}
     <div class="card mt-4 shadow-none">

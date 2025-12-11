@@ -102,80 +102,85 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center bg-light">
                     <h5 class="card-title mb-0">Detailed User Behavior</h5>
+                    <a href="{{ route('dashboard.export.user-behavior') }}" class="btn btn-success">
+                        Export Laporan
+                    </a>
                 </div>
+                <h5 class="card-title mb-0">Detailed User Behavior</h5>
+            </div>
 
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover align-middle mb-0">
-                            <thead class="table-light text-nowrap">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead class="table-light text-nowrap">
+                            <tr>
+                                <th>IP Address</th>
+                                <th>Requests</th>
+                                <th>Duration (min)</th>
+                                <th>Avg Click Gap (s)</th>
+                                <th>Behavior Type</th>
+                                <th>First Page</th>
+                                <th>Last Page</th>
+                                <th>Clickstream</th>
+                                <th>First Seen</th>
+                                <th>Last Seen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($userBehavior as $user)
                                 <tr>
-                                    <th>IP Address</th>
-                                    <th>Requests</th>
-                                    <th>Duration (min)</th>
-                                    <th>Avg Click Gap (s)</th>
-                                    <th>Behavior Type</th>
-                                    <th>First Page</th>
-                                    <th>Last Page</th>
-                                    <th>Clickstream</th>
-                                    <th>First Seen</th>
-                                    <th>Last Seen</th>
+                                    <td><span class="fw-medium">{{ $user['ip_address'] }}</span></td>
+                                    <td>{{ $user['total_requests'] }}</td>
+                                    <td>
+                                        @php
+                                            $durationDisplay = '-';
+                                            if ($user['duration_minutes'] > 0) {
+                                                $start = Carbon::parse($user['first_seen']);
+                                                $end = Carbon::parse($user['last_seen']);
+                                                $durationDisplay = $start->diffForHumans($end, [
+                                                    'parts' => 2,
+                                                    'short' => false,
+                                                    'syntax' => Carbon::DIFF_ABSOLUTE,
+                                                ]);
+                                            }
+                                        @endphp
+                                        {{ $durationDisplay }}
+                                    </td>
+                                    <td>{{ $user['avg_click_gap_sec'] }}</td>
+                                    <td>
+                                        @if ($user['behavior_type'] === 'possible bot / crawler')
+                                            <span class="badge bg-danger">Crawler / Bot</span>
+                                        @elseif ($user['behavior_type'] === 'high activity user')
+                                            <span class="badge bg-warning text-dark">High Activity</span>
+                                        @else
+                                            <span class="badge bg-success">Normal</span>
+                                        @endif
+                                    </td>
+                                    <td><code>{{ Str::limit($user['first_page'], 40) }}</code></td>
+                                    <td><code>{{ Str::limit($user['last_page'], 40) }}</code></td>
+                                    <td style="max-width: 300px;">
+                                        <small class="text-muted d-block text-truncate"
+                                            title="{{ $user['clickstream'] }}">
+                                            {{ Str::limit($user['clickstream'], 100) }}
+                                        </small>
+                                    </td>
+                                    <td>{{ $user['first_seen']->format('d M Y H:i') }}</td>
+                                    <td>{{ $user['last_seen']->format('d M Y H:i') }}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($userBehavior as $user)
-                                    <tr>
-                                        <td><span class="fw-medium">{{ $user['ip_address'] }}</span></td>
-                                        <td>{{ $user['total_requests'] }}</td>
-                                        <td>
-                                            @php
-                                                $durationDisplay = '-';
-                                                if ($user['duration_minutes'] > 0) {
-                                                    $start = Carbon::parse($user['first_seen']);
-                                                    $end = Carbon::parse($user['last_seen']);
-                                                    $durationDisplay = $start->diffForHumans($end, [
-                                                        'parts' => 2,
-                                                        'short' => false,
-                                                        'syntax' => Carbon::DIFF_ABSOLUTE,
-                                                    ]);
-                                                }
-                                            @endphp
-                                            {{ $durationDisplay }}
-                                        </td>
-                                        <td>{{ $user['avg_click_gap_sec'] }}</td>
-                                        <td>
-                                            @if ($user['behavior_type'] === 'possible bot / crawler')
-                                                <span class="badge bg-danger">Crawler / Bot</span>
-                                            @elseif ($user['behavior_type'] === 'high activity user')
-                                                <span class="badge bg-warning text-dark">High Activity</span>
-                                            @else
-                                                <span class="badge bg-success">Normal</span>
-                                            @endif
-                                        </td>
-                                        <td><code>{{ Str::limit($user['first_page'], 40) }}</code></td>
-                                        <td><code>{{ Str::limit($user['last_page'], 40) }}</code></td>
-                                        <td style="max-width: 300px;">
-                                            <small class="text-muted d-block text-truncate"
-                                                title="{{ $user['clickstream'] }}">
-                                                {{ Str::limit($user['clickstream'], 100) }}
-                                            </small>
-                                        </td>
-                                        <td>{{ $user['first_seen']->format('d M Y H:i') }}</td>
-                                        <td>{{ $user['last_seen']->format('d M Y H:i') }}</td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="10" class="text-center text-muted py-4">
-                                            <i class="ri-information-line me-1"></i>
-                                            No user behavior data available.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                            @empty
+                                <tr>
+                                    <td colspan="10" class="text-center text-muted py-4">
+                                        <i class="ri-information-line me-1"></i>
+                                        No user behavior data available.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- 🔹 Chart -->

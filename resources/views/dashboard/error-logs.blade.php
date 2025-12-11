@@ -114,6 +114,7 @@
 
 
 <x-layouts.dashboard>
+
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card mini-stats-wid border-0 shadow-sm">
@@ -122,6 +123,13 @@
                     <h4 class="fw-semibold mb-0">{{ $errorData['total_errors'] ?? 0 }}</h4>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 mb-2 text-end">
+            <a href="{{ route('dashboard.export.error-logs') }}" class="btn btn-success">
+                Export Laporan
+            </a>
         </div>
     </div>
 

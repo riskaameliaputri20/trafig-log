@@ -1,11 +1,12 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
-use App\Http\Controllers\Landing\LandingController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\ProductController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Landing\LandingController;
 
 // Authentication
 Route::middleware('guest')->group(function () {
@@ -39,4 +40,13 @@ Route::prefix('beranda')->middleware('auth')->name('dashboard.')->group(function
         Route::get('/server-performance', 'analyzeServerPerformance')->name('analyzeServerPerformance');
         Route::get('/popular-endpoints', 'popularEndpoints')->name('popularEndpoints');
     });
+    Route::get('/export/parsed-log', [ExportController::class, 'exportParsedLog'])->name('export.parse-log');
+    Route::get('/export/threats', [ExportController::class, 'exportThreats'])->name('export.threats');
+    Route::get('/export/error-logs', [ExportController::class, 'exportErrorLogs'])->name('export.error-logs');
+    Route::get('/export/user-behavior', [ExportController::class, 'exportUserBehavior'])->name('export.user-behavior');
+    Route::get('/export/login-activity', [ExportController::class, 'exportLoginActivity'])->name('export.login-activity');
+
 });
+
+
+

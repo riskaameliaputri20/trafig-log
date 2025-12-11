@@ -127,7 +127,12 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Basic Datatables</h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Basic Datatables</h5>
+                        <a href="{{ route('dashboard.export.parse-log') }}" class="btn btn-success">
+                            Export Laporan
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body table-responsive">
                     <x-table.traffic-table :traffics="$traffics" />
@@ -148,7 +153,9 @@
             <div class="card mt-4 shadow-sm border-0">
                 <div class="card-header d-flex justify-content-between align-items-center  text-white">
                     <h5 class="card-title mb-0">🛡️ Detected Threats</h5>
-                    <small class="text-light">Top Attackers Overview</small>
+                    <a href="{{ route('dashboard.export.threats') }}" class="btn btn-success">
+                        Export Laporan
+                    </a>
                 </div>
 
                 <div class="card-body table-responsive">
