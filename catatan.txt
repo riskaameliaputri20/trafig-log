@@ -15,3 +15,5 @@ taskschd.msc
 
     - chart untuk respon size
     - chart untuk respon code
+
+    
