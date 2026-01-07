@@ -1,130 +1,83 @@
- <div class="app-menu navbar-menu">
-     <!-- LOGO -->
-     <div class="navbar-brand-box">
-         <!-- Dark Logo-->
-         <a href="{{ route('dashboard.index') }}" class="logo logo-dark">
-             <span class="logo-sm">
-                 <x-img src="dashboard/assets/images/logo-sm.png" alt="" height="22" />
-             </span>
-             <span class="logo-lg">
-                 <x-img src="dashboard/assets/images/logo-dark.png" alt="" height="17" />
-             </span>
-         </a>
-         <!-- Light Logo-->
-         <a href="{{ route('dashboard.index') }}" class="logo logo-light">
-             <span class="logo-sm">
-                 <x-img src="dashboard/assets/images/logo-sm.png" alt="" height="22" />
-             </span>
-             <span class="logo-lg">
-                 <x-img src="dashboard/assets/images/logo-light.png" alt="" height="17" />
-             </span>
-         </a>
-         <button type="button" class="btn btn-sm fs-20 header-item btn-vertical-sm-hover float-end p-0"
-             id="vertical-hover">
-             <i class="ri-record-circle-line"></i>
-         </button>
-     </div>
+<div class="flex flex-col h-full bg-slate-900 text-slate-300">
+    <div class="flex items-center h-16 px-8 border-b border-white/5 bg-slate-900/50">
+        <a href="{{ route('dashboard.index') }}" class="flex items-center gap-3 group">
+            <div class="size-2 rounded-full bg-emerald-500 shadow-[0_0_12px_var(--color-emerald-500)] group-hover:scale-125 transition-transform"></div>
+            <div class="flex items-baseline">
+                <span class="text-lg font-black tracking-tighter text-white uppercase italic">
+                    LOG<span class="text-emerald-400">SCREEN</span>
+                </span>
+                <span class="ml-2 text-[10px] font-extralight tracking-[0.3em] text-slate-500 uppercase group-hover:text-emerald-400 transition-colors">
+                    RISKA
+                </span>
+            </div>
+        </a>
+    </div>
 
-     <div class="dropdown sidebar-user m-1 rounded">
-         <button type="button" class="btn material-shadow-none" id="page-header-user-dropdown"
-             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-             <span class="d-flex align-items-center gap-2">
-                 <x-img class="header-profile-user rounded" src="dashboard/assets/images/users/avatar-1.jpg"
-                     alt="Header Avatar" />
-                 <span class="text-start">
-                     <span class="d-block fw-medium sidebar-user-name-text">Anna Adame</span>
-                     <span class="d-block fs-14 sidebar-user-name-sub-text"><i
-                             class="ri ri-circle-fill fs-10 text-success align-baseline"></i> <span
-                             class="align-middle">Online</span></span>
-                 </span>
-             </span>
-         </button>
-         <div class="dropdown-menu dropdown-menu-end">
-             <!-- item-->
-             <h6 class="dropdown-header">Welcome Anna!</h6>
-             <a class="dropdown-item" href="pages-profile.html"><i
-                     class="mdi mdi-account-circle text-muted fs-16 me-1 align-middle"></i> <span
-                     class="align-middle">Profile</span></a>
-             <a class="dropdown-item" href="apps-chat.html"><i
-                     class="mdi mdi-message-text-outline text-muted fs-16 me-1 align-middle"></i> <span
-                     class="align-middle">Messages</span></a>
-             <a class="dropdown-item" href="apps-tasks-kanban.html"><i
-                     class="mdi mdi-calendar-check-outline text-muted fs-16 me-1 align-middle"></i> <span
-                     class="align-middle">Taskboard</span></a>
-             <a class="dropdown-item" href="pages-faqs.html"><i
-                     class="mdi mdi-lifebuoy text-muted fs-16 me-1 align-middle"></i> <span
-                     class="align-middle">Help</span></a>
-             <div class="dropdown-divider"></div>
-             <a class="dropdown-item" href="pages-profile.html"><i
-                     class="mdi mdi-wallet text-muted fs-16 me-1 align-middle"></i> <span class="align-middle">Balance :
-                     <b>$5971.67</b></span></a>
-             <a class="dropdown-item" href="pages-profile-settings.html"><span
-                     class="badge bg-success-subtle text-success float-end mt-1">New</span><i
-                     class="mdi mdi-cog-outline text-muted fs-16 me-1 align-middle"></i> <span
-                     class="align-middle">Settings</span></a>
-             <a class="dropdown-item" href="auth-lockscreen-basic.html"><i
-                     class="mdi mdi-lock text-muted fs-16 me-1 align-middle"></i> <span class="align-middle">Lock
-                     screen</span></a>
-             <a class="dropdown-item" href="auth-logout-basic.html"><i
-                     class="mdi mdi-logout text-muted fs-16 me-1 align-middle"></i> <span class="align-middle"
-                     data-key="t-logout">Logout</span></a>
-         </div>
-     </div>
-     <div id="scrollbar">
-         <div class="container-fluid">
+    <nav class="flex-1 px-4 py-6 overflow-y-auto custom-scrollbar">
+        
+        <div class="mb-8">
+            <p class="px-4 mb-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Analysis Menu</p>
+            <ul class="space-y-1.5">
+                <x-sidebar-link href="{{ route('dashboard.index') }}" 
+                                icon="ri-pie-chart-box-line" 
+                                :active="request()->routeIs('dashboard.index')">
+                    Overview
+                </x-sidebar-link>
 
-             <div id="two-column-menu">
-             </div>
-             <ul class="navbar-nav" id="navbar-nav">
-                 <li class="menu-title"><span data-key="t-menu">Menu</span></li>
-                 <li class="nav-item">
-                     <a class="nav-link menu-link" href="{{ route('dashboard.index') }}">
-                         <i class="ri-pie-chart-box-line"></i> <span>Dashboard</span>
-                     </a>
-                 </li>
-                 <li class="nav-item">
-                     <a class="nav-link menu-link" href="{{ route('dashboard.userBehavior') }}">
-                         <i class="ri-user-line"></i> <span>User Behavior</span>
-                     </a>
-                 </li>
-                 <li class="nav-item">
-                     <a class="nav-link menu-link" href="{{ route('dashboard.analyzeErrorLogs') }}">
-                         <i class="ri-error-warning-line"></i>
-                         <span>Error Logs</span>
-                     </a>
-                 </li>
+                <x-sidebar-link href="{{ route('dashboard.userBehavior') }}" 
+                                icon="ri-user-search-line" 
+                                :active="request()->routeIs('dashboard.userBehavior')">
+                    User Behavior
+                </x-sidebar-link>
 
-                 <li class="nav-item">
-                     <a class="nav-link menu-link" href="{{ route('dashboard.loginActivity') }}">
-                         <i class="ri-shield-user-line"></i>
-                         <span>Login Activity</span>
-                     </a>
-                 </li>
+                <x-sidebar-link href="{{ route('dashboard.analyzeErrorLogs') }}" 
+                                icon="ri-bug-line" 
+                                :active="request()->routeIs('dashboard.analyzeErrorLogs')">
+                    Error Logs
+                </x-sidebar-link>
 
-                 <li class="nav-item">
-                     <a class="nav-link menu-link" href="{{ route('dashboard.analyzeServerPerformance') }}">
-                         <i class="ri-dashboard-line"></i>
-                         <span>Server Performance</span>
-                     </a>
-                 </li>
+                <x-sidebar-link href="{{ route('dashboard.loginActivity') }}" 
+                                icon="ri-shield-keyhole-line" 
+                                :active="request()->routeIs('dashboard.loginActivity')">
+                    Security / Login
+                </x-sidebar-link>
 
-                 <li class="nav-item">
-                     <a class="nav-link menu-link" href="{{ route('dashboard.popularEndpoints') }}">
-                         <i class="ri-git-branch-line"></i>
-                         <span>Popular Endpoint</span>
-                     </a>
-                 </li>
-                 <li class="menu-title"><span data-key="t-menu">Settings</span></li>
-                 <li class="nav-item">
-                     <a class="nav-link menu-link" href="{{ route('dashboard.setting.account') }}">
-                         <i class="ri-settings-line"></i> <span>Account</span>
-                     </a>
-                 </li>
+                <x-sidebar-link href="{{ route('dashboard.analyzeServerPerformance') }}" 
+                                icon="ri-pulse-line" 
+                                :active="request()->routeIs('dashboard.analyzeServerPerformance')">
+                    Performance
+                </x-sidebar-link>
 
-             </ul>
-         </div>
-         <!-- Sidebar -->
-     </div>
+                <x-sidebar-link href="{{ route('dashboard.popularEndpoints') }}" 
+                                icon="ri-route-line" 
+                                :active="request()->routeIs('dashboard.popularEndpoints')">
+                    Top Endpoints
+                </x-sidebar-link>
+            </ul>
+        </div>
 
-     <div class="sidebar-background"></div>
- </div>
+        <div>
+            <p class="px-4 mb-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">System</p>
+            <ul class="space-y-1.5">
+                <x-sidebar-link href="{{ route('dashboard.setting.account') }}" 
+                                icon="ri-settings-3-line" 
+                                :active="request()->routeIs('dashboard.setting.account')">
+                    Settings
+                </x-sidebar-link>
+
+                <li>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-red-400 hover:bg-red-500/10 transition-all group">
+                            <i class="ri-logout-circle-r-line text-lg opacity-70 group-hover:opacity-100"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+
+    </nav>
+
+ 
+</div>

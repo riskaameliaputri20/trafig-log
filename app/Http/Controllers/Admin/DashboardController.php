@@ -18,61 +18,54 @@ class DashboardController extends Controller
         $this->logService = $logService;
     }
 
-    /**
-     * Dashboard utama: menampilkan trafik & ancaman
-     */
     public function index(Request $request)
     {
-        // ✅ Gunakan instance yang di-inject (tidak perlu new)
         $traffics = $this->logService->parseLog();
         $threats = $this->logService->detectThreats();
 
-        // 🔹 Hitung total request
-        $trafikCount = $traffics->count();
+        // 1. Persiapan Data Area Chart (Response Size)
+        // Ambil 50 data terbaru untuk performa
+        $recentTraffics = $traffics->sortBy('access_time')->take(-50);
+        $prices = $recentTraffics->pluck('response_size')->toArray();
+        $dates = $recentTraffics
+            ->pluck('access_time')
+            ->map(fn($d) => $d->toIso8601String())
+            ->toArray();
 
-        // 🔹 Hitung request hari ini
-        $trafikCountToday = $traffics->filter(function ($item) {
-            return isset($item['access_time']) && $item['access_time']->isToday();
-        })->count();
+        // 2. Persiapan Data Donut Chart (Status Code)
+        $statusCounts = $traffics->groupBy('status_code')->map->count()->sortKeys();
 
-        // 🔹 Kelompokkan berdasarkan status code
-        $statusCounts = $traffics
-            ->groupBy(fn($item) => $item['status_code'] ?? 0)
-            ->map(fn($group) => $group->count())
-            ->sortKeys();
-
-        // 🔹 Paginasi trafik
+        // 3. Paginasi Data (Pastikan logic ini tetap ada)
         $perPage = 25;
-        $page = (int) $request->get('page', 1);
         $paginatedTraffics = paginateCollection(
             $traffics->sortByDesc('access_time')->values(),
             $perPage,
-            $page,
+            (int) $request->get('page', 1),
             [
                 'path' => $request->url(),
                 'query' => $request->query(),
-            ]
+            ],
         );
-
-        // 🔹 Paginasi threats
-        $threatsPerPage = 10;
-        $threatsPage = (int) $request->get('threats_page', 1);
         $paginatedThreats = paginateCollection(
             $threats,
-            $threatsPerPage,
-            $threatsPage,
+            10,
+            (int) $request->get('threats_page', 1),
             [
                 'path' => $request->url(),
-                'query' => array_merge($request->query(), ['tab' => 'threats']),
-            ]
+                'query' => $request->query(),
+            ],
         );
 
         return view('dashboard.index', [
             'traffics' => $paginatedTraffics,
-            'trafikCount' => $trafikCount,
-            'trafikCountToday' => $trafikCountToday,
-            'statusCounts' => $statusCounts,
             'threats' => $paginatedThreats,
+            'prices' => $prices,
+            'dates' => $dates,
+            'statusCounts' => $statusCounts,
+            'trafikCount' => $traffics->count(),
+            'trafikCountToday' => $traffics
+                ->filter(fn($i) => $i['access_time']->isToday())
+                ->count(),
         ]);
     }
 
@@ -135,7 +128,10 @@ class DashboardController extends Controller
         Cache::forget('detected_threats_custom');
         Cache::forget('detected_threats_default');
 
-        return back()->with('success', 'File log custom berhasil dihapus. Sistem kembali ke log default.');
+        return back()->with(
+            'success',
+            'File log custom berhasil dihapus. Sistem kembali ke log default.',
+        );
     }
 
     // login activity
@@ -154,7 +150,7 @@ class DashboardController extends Controller
             [
                 'path' => $request->url(),
                 'query' => $request->query(),
-            ]
+            ],
         );
 
         return view('dashboard.login-activity', [
@@ -171,17 +167,14 @@ class DashboardController extends Controller
     ============================================================ */
         if (PHP_OS_FAMILY === 'Windows') {
             $cpuOutput = shell_exec(
-                'powershell -command "(Get-Counter \'\\Processor(_Total)\\% Processor Time\').CounterSamples.CookedValue"'
+                'powershell -command "(Get-Counter \'\\Processor(_Total)\\% Processor Time\').CounterSamples.CookedValue"',
             );
 
-            $cpuUsage = is_numeric(trim($cpuOutput))
-                ? round((float)$cpuOutput, 2)
-                : null;
+            $cpuUsage = is_numeric(trim($cpuOutput)) ? round((float) $cpuOutput, 2) : null;
         } else {
             $load = function_exists('sys_getloadavg') ? sys_getloadavg() : null;
             $cpuUsage = $load ? $load[0] : null;
         }
-
 
         /* ============================================================
      |                     MEMORY USAGE (RAM)
@@ -197,18 +190,19 @@ class DashboardController extends Controller
             preg_match('/MemTotal:\s+(\d+)/', $memInfo, $totalMatch);
             preg_match('/MemAvailable:\s+(\d+)/', $memInfo, $availableMatch);
 
-            $memoryTotal = round($totalMatch[1] / 1024, 2);     // MB
-            $memoryFree  = round($availableMatch[1] / 1024, 2); // MB
+            $memoryTotal = round($totalMatch[1] / 1024, 2); // MB
+            $memoryFree = round($availableMatch[1] / 1024, 2); // MB
         } else {
             // WINDOWS (pakai PowerShell)
-            $psCommand = 'powershell -command "Get-CimInstance Win32_OperatingSystem | Select-Object FreePhysicalMemory,TotalVisibleMemorySize | ConvertTo-Json"';
+            $psCommand =
+                'powershell -command "Get-CimInstance Win32_OperatingSystem | Select-Object FreePhysicalMemory,TotalVisibleMemorySize | ConvertTo-Json"';
 
             $output = shell_exec($psCommand);
             $data = json_decode($output, true);
 
             if ($data) {
                 $memoryTotal = round($data['TotalVisibleMemorySize'] / 1024, 2); // MB
-                $memoryFree  = round($data['FreePhysicalMemory'] / 1024, 2);     // MB
+                $memoryFree = round($data['FreePhysicalMemory'] / 1024, 2); // MB
             }
         }
 
@@ -220,38 +214,35 @@ class DashboardController extends Controller
         $diskPath = PHP_OS_FAMILY === 'Windows' ? 'C:' : '/';
 
         $diskTotal = round(disk_total_space($diskPath) / 1073741824, 2); // GB
-        $diskFree  = round(disk_free_space($diskPath) / 1073741824, 2); // GB
-        $diskUsed  = $diskTotal - $diskFree;
-
+        $diskFree = round(disk_free_space($diskPath) / 1073741824, 2); // GB
+        $diskUsed = $diskTotal - $diskFree;
 
         /* ============================================================
      |            PHP CONFIG (Memory Limit / Execution Time)
     ============================================================ */
-        $phpMemoryLimit = ini_get("memory_limit");
-        $maxExecution   = ini_get("max_execution_time");
-
+        $phpMemoryLimit = ini_get('memory_limit');
+        $maxExecution = ini_get('max_execution_time');
 
         /* ============================================================
      |                 DATABASE RESPONSE TIME
     ============================================================ */
         $start = microtime(true);
-        \Illuminate\Support\Facades\DB::select("SELECT 1");
+        \Illuminate\Support\Facades\DB::select('SELECT 1');
         $dbResponse = round((microtime(true) - $start) * 1000, 2); // ms
-
 
         /* ============================================================
      |                      RETURN VIEW
     ============================================================ */
         return view('dashboard.server-performance', [
-            'cpuUsage'       => $cpuUsage,
-            'memoryTotal'    => $memoryTotal,
-            'memoryFree'     => $memoryFree,
-            'diskTotal'      => $diskTotal,
-            'diskUsed'       => $diskUsed,
-            'diskFree'       => $diskFree,
+            'cpuUsage' => $cpuUsage,
+            'memoryTotal' => $memoryTotal,
+            'memoryFree' => $memoryFree,
+            'diskTotal' => $diskTotal,
+            'diskUsed' => $diskUsed,
+            'diskFree' => $diskFree,
             'phpMemoryLimit' => $phpMemoryLimit,
-            'maxExecution'   => $maxExecution,
-            'dbResponse'     => $dbResponse
+            'maxExecution' => $maxExecution,
+            'dbResponse' => $dbResponse,
         ]);
     }
     public function popularEndpoints()

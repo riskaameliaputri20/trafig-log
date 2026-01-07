@@ -1,73 +1,44 @@
-<div class="card">
-    <div class="card-body">
-        <div id="chart"></div>
+@props(['prices', 'dates'])
+
+<div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm h-full">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h3 class="text-sm font-black text-slate-900 uppercase tracking-[0.2em]">Response Size</h3>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 italic">Payload Trend</p>
+        </div>
+        <div class="size-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+            <i class="ri-pulse-line text-xl"></i>
+        </div>
     </div>
+    <div id="chartResponseSize"></div>
 </div>
 
 @push('script')
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script>
-        var seriesData = {
-            monthDataSeries1: {
-                prices: @json($prices),
-                dates: @json($dates)
-            }
-        };
-
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
         var options = {
-            series: [{
-                name: "Traffic Size (bytes)",
-                data: seriesData.monthDataSeries1.prices
-            }],
-            chart: {
-                type: 'area',
-                height: 350,
-                zoom: {
-                    enabled: true
-                }
-            },
+            series: [{ name: "Size (Bytes)", data: @json($prices) }],
+            chart: { type: 'area', height: 350, toolbar: { show: false }, fontFamily: 'Inter' },
             dataLabels: {
                 enabled: false
             },
-            stroke: {
-                width: 1,
-                curve: 'monotoneCubic'
-            },
-            title: {
-                text: 'Traffic Response Size per Access Time',
-                align: 'left'
-            },
-            xaxis: {
-                type: 'datetime',
-                categories: seriesData.monthDataSeries1.dates,
-                labels: {
-                    datetimeFormatter: {
-                        year: 'yyyy',
-                        month: "MMM 'yy",
-                        day: 'dd MMM',
-                        hour: 'HH:mm'
-                    }
-                },
-                title: {
-                    text: 'Access Time (Date & Hour)'
-                }
+            colors: ['#10b981'],
+            stroke: { curve: 'smooth', width: 3 },
+            fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0 } },
+            xaxis: { 
+                type: 'datetime', 
+                categories: @json($dates),
+                labels: { style: { colors: '#94a3b8', fontSize: '10px' } }
             },
             yaxis: {
-                title: {
-                    text: 'Response Size (bytes)'
+                labels: { 
+                    style: { colors: '#94a3b8', fontSize: '10px' },
+                    formatter: (val) => (val / 1024).toFixed(1) + ' KB'
                 }
             },
-            tooltip: {
-                x: {
-                    format: 'dd MMM yyyy HH:mm:ss'
-                }
-            },
-            legend: {
-                horizontalAlign: 'left'
-            }
+            tooltip: { theme: 'dark', x: { format: 'dd MMM HH:mm' } }
         };
-
-        var chart = new ApexCharts(document.querySelector("#chart"), options);
-        chart.render();
-    </script>
+        new ApexCharts(document.querySelector("#chartResponseSize"), options).render();
+    });
+</script>
 @endpush

@@ -1,65 +1,95 @@
-  <header id="page-topbar">
-      <div class="layout-width">
-          <div class="navbar-header">
-              <div class="d-flex">
-                  <!-- LOGO -->
-                  <div class="navbar-brand-box horizontal-logo">
-                      <a href="{{ route('dashboard.index') }}" class="logo logo-dark">
-                          <span class="logo-sm">
-                              <x-img src="dashboard/assets/images/logo-sm.png" alt="" height="22" />
-                          </span>
-                          <span class="logo-lg">
-                              <x-img src="dashboard/assets/images/logo-dark.png" alt="" height="17" />
-                          </span>
-                      </a>
+<div class="flex items-center justify-between w-full">
 
-                      <a href="{{ route('dashboard.index') }}" class="logo logo-light">
-                          <span class="logo-sm">
-                              <x-img src="dashboard/assets/images/logo-sm.png" alt="" height="22" />
-                          </span>
-                          <span class="logo-lg">
-                              <x-img src="dashboard/assets/images/logo-light.png" alt="" height="17" />
-                          </span>
-                      </a>
-                  </div>
+    <div class="flex items-center gap-4">
+        <div class="hidden sm:block">
+            <h1 class="text-sm font-semibold text-slate-800 uppercase tracking-wider">
+                System Monitoring <span class="mx-2 text-slate-300">/</span>
+                <span class="text-emerald-600">{{ $title ?? 'Overview' }}</span>
+            </h1>
+        </div>
+    </div>
 
-                  <button type="button"
-                      class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger material-shadow-none"
-                      id="topnav-hamburger-icon">
-                      <span class="hamburger-icon">
-                          <span></span>
-                          <span></span>
-                          <span></span>
-                      </span>
-                  </button>
+    <div class="flex items-center gap-3">
 
-              </div>
+        <div
+            class="relative"
+            x-data="{ open: false }"
+            @click.away="open = false"
+        >
+            <button
+                @click="open = !open"
+                type="button"
+                class="flex items-center gap-3 p-1.5 pl-3 rounded-2xl hover:bg-slate-100 transition-all border border-transparent hover:border-slate-200 group"
+            >
 
-              <div class="d-flex align-items-center">
+                <div class="text-right hidden md:block">
+                    <p class="text-xs font-bold text-slate-900 leading-none truncate w-24">
+                        {{ auth()->user()->name }}
+                    </p>
+                    <p
+                        class="text-[10px] font-bold text-emerald-600 uppercase tracking-tighter mt-1">
+                        Administrator
+                    </p>
+                </div>
 
-                  <div class="dropdown ms-sm-3 header-item topbar-user">
-                      <button type="button" class="btn material-shadow-none" id="page-header-user-dropdown"
-                          data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <span class="d-flex align-items-center">
-                              <x-img class="rounded-circle header-profile-user"
-                                  src="{{ Storage::url(auth()->user()->profile) }}" alt="Header Avatar" />
-                              <span class="text-start ms-xl-2">
-                                  <span
-                                      class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{ auth()->user()->name }}</span>
-                                  <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">ADMIN</span>
-                              </span>
-                          </span>
-                      </button>
-                      <div class="dropdown-menu dropdown-menu-end">
-                          <!-- item-->
-                          <h6 class="dropdown-header">Welcome !</h6>
-                          <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="{{ route('logout') }}"><i
-                                  class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
-                                  class="align-middle" data-key="t-logout">Logout</span></a>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </header>
+                <div class="relative">
+                    <img
+                        class="size-9 rounded-xl object-cover ring-2 ring-slate-100 group-hover:ring-emerald-100 transition-all"
+                        src="{{ auth()->user()->profile ? Storage::url(auth()->user()->profile) : asset('assets/img/avatar-default.png') }}"
+                        alt="Header Avatar"
+                    />
+                    <div
+                        class="absolute bottom-0 right-0 size-2.5 bg-emerald-500 border-2 border-white rounded-full">
+                    </div>
+                </div>
+
+                <i
+                    class="ri-arrow-down-s-line text-slate-400 transition-transform duration-200"
+                    :class="open ? 'rotate-180' : ''"
+                ></i>
+            </button>
+
+            <div
+                x-show="open"
+                x-transition:enter="transition ease-out duration-100"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-cloak
+                class="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 z-50"
+            >
+
+                <div class="px-4 py-2 border-b border-slate-50 mb-2">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Signed
+                        in as</p>
+                    <p class="text-xs font-semibold text-slate-900 truncate">
+                        {{ auth()->user()->email }}</p>
+                </div>
+
+                <a
+                    href="#"
+                    class="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-emerald-600 transition-colors"
+                >
+                    <i class="ri-user-settings-line text-lg"></i>
+                    <span>My Profile</span>
+                </a>
+
+                <div class="h-px bg-slate-100 my-2"></div>
+
+                <form
+                    action="{{ route('logout') }}"
+                    method="POST"
+                >
+                    @csrf
+                    <button
+                        type="submit"
+                        class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                    >
+                        <i class="ri-logout-circle-r-line text-lg"></i>
+                        <span class="font-semibold">Sign Out</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>

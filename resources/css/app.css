@@ -6,6 +6,24 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-slate-900: #0f172a;
+  
+  --font-inter: "Inter", ui-sans-serif, system-ui;
+}
+
+/* Custom Scrollbar */
+@utility custom-scrollbar {
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { 
+    background: var(--color-slate-700); 
+    border-radius: 10px; 
+  }
+}
+
+/* Pastikan ini ada di file CSS kamu */
+[x-cloak] { 
+    display: none !important; 
 }

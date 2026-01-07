@@ -14,7 +14,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login', [AuthController::class, 'loginProcess'])->name('loginProcess');
 });
-Route::get('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+Route::any('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 // Landing Page
 Route::name('landing.')->group(function () {

@@ -24,6 +24,7 @@ class LogService
         } else {
             $filePath = config('log.location');
         }
+        
 
         // --- Pastikan file ada ---
         if (!file_exists($filePath)) {

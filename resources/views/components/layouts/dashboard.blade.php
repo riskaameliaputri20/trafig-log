@@ -1,109 +1,128 @@
 @props(['title' => ''])
 <!doctype html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
-    data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default"
-    data-layout-width="boxed">
+<html
+    lang="en"
+    class="h-full bg-slate-50"
+>
 
 <head>
-
     <meta charset="utf-8" />
-    <title>{{ $title ?? 'Dashboard' }}</title>
-    <!-- App favicon -->
-    <x-link rel="shortcut icon" href="dashboard/assets/images/favicon.ico" />
+    <title>{{ $title ?? 'Dashboard' }} | LogScreen Riska</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <x-link
+        rel="shortcut icon"
+        href="dashboard/assets/images/favicon.ico"
+    />
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <x-link
+        href="dashboard/assets/css/icons.min.css"
+        rel="stylesheet"
+        type="text/css"
+    />
+
+
+    @vite(['resources/css/app.css'])
+
     @stack('style')
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <!-- Layout config Js -->
-    <x-script src="dashboard/assets/js/layout.js"></x-script>
-    <!-- Bootstrap Css -->
-    <x-link href="dashboard/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <!-- Icons Css -->
-    <x-link href="dashboard/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
 
-
-    <!-- App Css-->
-    <x-link href="dashboard/assets/css/app.min.css" rel="stylesheet" type="text/css" />
-    <!-- custom Css-->
-    <x-link href="dashboard/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
 
 </head>
 
-<body>
+<body
+    class="h-full antialiased font-inter"
+    x-data="{ mobileSidebarOpen: false }"
+>
 
-    <!-- Begin page -->
-    <div id="layout-wrapper">
+    <div
+        x-show="mobileSidebarOpen"
+        class="fixed inset-0 z-[100] lg:hidden"
+        x-cloak
+    >
 
-        @include('__partials.dashboard.header')
-        @include('__partials.dashboard.sidebar')
-        <!-- Left Sidebar End -->
-        <!-- Vertical Overlay-->
-        <div class="vertical-overlay"></div>
+        <div
+            x-show="mobileSidebarOpen"
+            x-transition:enter="transition-opacity ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            @click="mobileSidebarOpen = false"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+        ></div>
 
-        <!-- ============================================================== -->
-        <!-- Start right Content here -->
-        <!-- ============================================================== -->
-        <div class="main-content">
+        <div
+            x-show="mobileSidebarOpen"
+            x-transition:enter="transition ease-in-out duration-300 transform"
+            x-transition:enter-start="-translate-x-full"
+            x-transition:enter-end="translate-x-0"
+            class="relative flex flex-col w-72 h-full bg-slate-900"
+        >
 
-            <div class="page-content">
-                <div class="container-fluid">
-                    {{ $slot }}
-                </div>
-                <!-- container-fluid -->
+            <div class="p-4 flex justify-end">
+                <button
+                    @click="mobileSidebarOpen = false"
+                    class="text-white/50 hover:text-white"
+                >
+                    <i class="ri-close-line text-2xl"></i>
+                </button>
             </div>
-            <!-- End Page-content -->
 
-            <footer class="footer">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <script>
-                                document.write(new Date().getFullYear())
-                            </script> © Velzon.
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="text-sm-end d-none d-sm-block">
-                                Design & Develop by Themesbrand
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-        </div>
-        <!-- end main content-->
-
-    </div>
-    <!-- END layout-wrapper -->
-
-    <!--start back-to-top-->
-    <button onclick="topFunction()" class="btn btn-danger btn-icon" id="back-to-top">
-        <i class="ri-arrow-up-line"></i>
-    </button>
-    <!--end back-to-top-->
-
-    <!--preloader-->
-    <div id="preloader">
-        <div id="status">
-            <div class="spinner-border text-primary avatar-sm" role="status">
-                <span class="visually-hidden">Loading...</span>
+            <div class="flex-1 overflow-y-auto pt-2">
+                @include('__partials.dashboard.sidebar')
             </div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT -->
-    <x-script src="dashboard/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></x-script>
-    <x-script src="dashboard/assets/libs/simplebar/simplebar.min.js"></x-script>
-    <x-script src="dashboard/assets/libs/node-waves/waves.min.js"></x-script>
-    <x-script src="dashboard/assets/libs/feather-icons/feather.min.js"></x-script>
-    <x-script src="dashboard/assets/js/pages/plugins/lord-icon-2.1.0.js"></x-script>
-    <x-script src="dashboard/assets/js/plugins.js"></x-script>
+    <div
+        id="layout-wrapper"
+        class="flex min-h-screen"
+    >
+        <aside class="hidden lg:flex lg:flex-col lg:w-72 lg:fixed lg:inset-y-0 bg-slate-900 z-50">
+            @include('__partials.dashboard.sidebar')
+        </aside>
 
-    {{-- 1. jQuery dulu --}}
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <div class="flex-1 flex flex-col lg:pl-72 w-full">
+            <header
+                class="sticky top-0 z-40 h-16 bg-white/80 backdrop-blur-md border-b flex items-center justify-between px-4"
+            >
 
+                <button
+                    @click="mobileSidebarOpen = true"
+                    type="button"
+                    class="lg:hidden p-2 text-slate-600"
+                >
+                    <i class="ri-menu-2-line text-2xl"></i>
+                </button>
 
+                @include('__partials.dashboard.header')
+            </header>
+
+            <main class="p-6">
+                {{ $slot }}
+            </main>
+        </div>
+    </div>
     @stack('script')
 
-    <!-- App js -->
-    <x-script src="dashboard/assets/js/app.js"></x-script>
+    @vite(['resources/js/app.js'])
 </body>
 
 </html>

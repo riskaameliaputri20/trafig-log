@@ -1,191 +1,180 @@
-@push('style')
-    <style>
-        .perf-box h4 {
-            font-weight: 700;
-            margin-bottom: 0;
-        }
+<x-layouts.dashboard title="Server Performance Monitor">
 
-        .perf-status {
-            font-size: 0.8rem;
-        }
-    </style>
-@endpush
+    <div class="mb-8">
+        <h2 class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">
+            Server <span class="text-emerald-500">Resource</span> Monitor
+        </h2>
+        <p class="text-sm text-slate-500 font-medium italic">Real-time infrastructure health and system metrics</p>
+    </div>
 
-<x-layouts.dashboard title="Server Performance">
-
-    <h3 class="mb-4">📊 Analisis Kinerja Server</h3>
-
-    <div class="row">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 
         {{-- ======================= CPU USAGE ======================= --}}
-        <div class="col-xl-4 col-md-6">
-            <div class="card card-animate shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">CPU Usage</h5>
+        @php
+            $cpuStatus = match(true) {
+                $cpuUsage >= 70 => ['color' => 'rose', 'text' => 'Critical'],
+                $cpuUsage >= 40 => ['color' => 'amber', 'text' => 'High Load'],
+                default => ['color' => 'emerald', 'text' => 'Normal'],
+            };
+        @endphp
+        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm group hover:border-{{ $cpuStatus['color'] }}-200 transition-all duration-300">
+            <div class="flex justify-between items-start mb-6">
+                <div class="size-12 bg-{{ $cpuStatus['color'] }}-50 text-{{ $cpuStatus['color'] }}-600 rounded-2xl flex items-center justify-center">
+                    <i class="ri-cpu-line text-2xl"></i>
                 </div>
-                <div class="card-body">
-                    <div class="perf-box">
-                        <h4>
-                            @if ($cpuUsage === null)
-                                <span class="text-muted">Not Supported (Windows)</span>
-                            @else
-                                {{ $cpuUsage }}%
-                            @endif
-                        </h4>
+                <span class="px-2.5 py-1 bg-{{ $cpuStatus['color'] }}-50 text-{{ $cpuStatus['color'] }}-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-{{ $cpuStatus['color'] }}-100">
+                    {{ $cpuStatus['text'] }}
+                </span>
+            </div>
+            
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Processor Load</p>
+            <h4 class="text-4xl font-black text-slate-900 tracking-tighter italic">
+                @if ($cpuUsage === null)
+                    <span class="text-slate-300 text-xl">Unsupported</span>
+                @else
+                    {{ $cpuUsage }}<span class="text-lg text-slate-400 font-medium">%</span>
+                @endif
+            </h4>
 
-                        @php
-                            $cpuStatus = 'success';
-                            $cpuText = 'Normal';
-                            if ($cpuUsage >= 70) {
-                                $cpuStatus = 'danger';
-                                $cpuText = 'Critical';
-                            } elseif ($cpuUsage >= 40) {
-                                $cpuStatus = 'warning';
-                                $cpuText = 'High Load';
-                            }
-                        @endphp
-
-                        <span class="badge bg-{{ $cpuStatus }} perf-status">{{ $cpuText }}</span>
-
-                        <div class="progress mt-3" style="height: 8px;">
-                            <div class="progress-bar bg-{{ $cpuStatus }}" role="progressbar"
-                                style="width: {{ $cpuUsage ?? 0 }}%">
-                            </div>
-                        </div>
-
-                        <small class="text-muted d-block mt-2">
-                            Semakin tinggi load, semakin berat server bekerja.
-                        </small>
-                    </div>
+            <div class="mt-6">
+                <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-{{ $cpuStatus['color'] }}-500 transition-all duration-1000 ease-out" 
+                         style="width: {{ $cpuUsage ?? 0 }}%"></div>
                 </div>
+                <p class="mt-3 text-[10px] text-slate-400 font-medium leading-relaxed">
+                    Semakin tinggi load, semakin berat server bekerja memproses request.
+                </p>
             </div>
         </div>
 
         {{-- ======================= MEMORY USAGE ======================= --}}
-        <div class="col-xl-4 col-md-6">
-            <div class="card card-animate shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Memory Usage</h5>
+        @php
+            $memTotal = $memoryTotal;
+            $memFree = $memoryFree;
+            $memUsed = $memTotal - $memFree;
+            $memPercent = $memTotal > 0 ? round(($memUsed / $memTotal) * 100, 2) : 0;
+
+            $memStatus = match(true) {
+                $memPercent >= 80 => ['color' => 'rose', 'text' => 'Low Memory'],
+                $memPercent >= 50 => ['color' => 'amber', 'text' => 'High Usage'],
+                default => ['color' => 'emerald', 'text' => 'Healthy'],
+            };
+        @endphp
+        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm group hover:border-{{ $memStatus['color'] }}-200 transition-all duration-300">
+            <div class="flex justify-between items-start mb-6">
+                <div class="size-12 bg-{{ $memStatus['color'] }}-50 text-{{ $memStatus['color'] }}-600 rounded-2xl flex items-center justify-center">
+                    <i class="ri-ram-line text-2xl"></i>
                 </div>
-                <div class="card-body">
+                <span class="px-2.5 py-1 bg-{{ $memStatus['color'] }}-50 text-{{ $memStatus['color'] }}-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-{{ $memStatus['color'] }}-100">
+                    {{ $memStatus['text'] }}
+                </span>
+            </div>
 
-                    @php
-                        $memTotal = $memoryTotal;
-                        $memFree = $memoryFree;
-                        $memUsed = $memTotal - $memFree;
-                        $memPercent = $memTotal > 0 ? round(($memUsed / $memTotal) * 100, 2) : 0;
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Physical Memory</p>
+            <h4 class="text-2xl font-black text-slate-900 tracking-tighter italic">
+                {{ number_format($memUsed) }} <span class="text-sm text-slate-400 font-medium">/ {{ number_format($memTotal) }} MB</span>
+            </h4>
 
-                        $memStatus = 'success';
-                        $memText = 'Normal';
-                        if ($memPercent >= 80) {
-                            $memStatus = 'danger';
-                            $memText = 'Low Memory';
-                        } elseif ($memPercent >= 50) {
-                            $memStatus = 'warning';
-                            $memText = 'High Usage';
-                        }
-                    @endphp
-
-                    <h4>{{ $memUsed }} MB / {{ $memTotal }} MB</h4>
-                    <span class="badge bg-{{ $memStatus }}">{{ $memText }}</span>
-
-                    <div class="progress mt-3" style="height: 8px;">
-                        <div class="progress-bar bg-{{ $memStatus }}" style="width: {{ $memPercent }}%">
-                        </div>
-                    </div>
-
-                    <p class="mt-3 mb-0">
-                        <small class="text-muted">
-                            Free Memory: <b>{{ $memFree }} MB</b>
-                        </small>
-                    </p>
+            <div class="mt-6">
+                <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden text-right">
+                    <div class="h-full bg-{{ $memStatus['color'] }}-500 transition-all duration-1000 ease-out" 
+                         style="width: {{ $memPercent }}%"></div>
+                </div>
+                <div class="mt-3 flex justify-between items-center">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase">Free Memory</span>
+                    <span class="text-xs font-black text-slate-700">{{ number_format($memFree) }} MB</span>
                 </div>
             </div>
         </div>
 
         {{-- ======================= DISK USAGE ======================= --}}
-        <div class="col-xl-4 col-md-6">
-            <div class="card card-animate shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Disk Usage</h5>
+        @php
+            $diskPercent = round(($diskUsed / $diskTotal) * 100, 2);
+            $diskStatus = match(true) {
+                $diskPercent >= 85 => ['color' => 'rose', 'text' => 'Critical'],
+                $diskPercent >= 60 => ['color' => 'amber', 'text' => 'Warning'],
+                default => ['color' => 'emerald', 'text' => 'Safe'],
+            };
+        @endphp
+        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm group hover:border-{{ $diskStatus['color'] }}-200 transition-all duration-300">
+            <div class="flex justify-between items-start mb-6">
+                <div class="size-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200">
+                    <i class="ri-hard-drive-2-line text-2xl"></i>
                 </div>
-                <div class="card-body">
-                    @php
-                        $diskPercent = round(($diskUsed / $diskTotal) * 100, 2);
+                <span class="px-2.5 py-1 bg-{{ $diskStatus['color'] }}-50 text-{{ $diskStatus['color'] }}-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-{{ $diskStatus['color'] }}-100">
+                    {{ $diskStatus['text'] }}
+                </span>
+            </div>
 
-                        $diskStatus = 'success';
-                        $diskText = 'Normal';
-                        if ($diskPercent >= 85) {
-                            $diskStatus = 'danger';
-                            $diskText = 'Critical (Almost Full)';
-                        } elseif ($diskPercent >= 60) {
-                            $diskStatus = 'warning';
-                            $diskText = 'High Usage';
-                        }
-                    @endphp
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Storage Capacity</p>
+            <h4 class="text-2xl font-black text-slate-900 tracking-tighter italic">
+                {{ $diskUsed }} <span class="text-sm text-slate-400 font-medium">/ {{ $diskTotal }} GB</span>
+            </h4>
 
-                    <h4>{{ $diskUsed }} GB / {{ $diskTotal }} GB</h4>
-                    <span class="badge bg-{{ $diskStatus }}">{{ $diskText }}</span>
-
-                    <div class="progress mt-3" style="height: 8px;">
-                        <div class="progress-bar bg-{{ $diskStatus }}" style="width: {{ $diskPercent }}%">
-                        </div>
-                    </div>
-
-                    <p class="mt-3">
-                        <small class="text-muted">
-                            Free Disk: <b>{{ $diskFree }} GB</b>
-                        </small>
-                    </p>
+            <div class="mt-6">
+                <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-slate-900 transition-all duration-1000 ease-out" 
+                         style="width: {{ $diskPercent }}%"></div>
+                </div>
+                <div class="mt-3 flex justify-between items-center">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase">Available Space</span>
+                    <span class="text-xs font-black text-slate-700">{{ $diskFree }} GB</span>
                 </div>
             </div>
         </div>
 
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
         {{-- ======================= PHP RUNTIME ======================= --}}
-        <div class="col-xl-6 col-md-6 mt-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">PHP Runtime</h5>
+        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+            <h5 class="text-xs font-black text-slate-900 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                <i class="ri-server-line text-emerald-500"></i>
+                System Environment
+            </h5>
+            
+            <div class="space-y-4">
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">PHP Memory Limit</span>
+                    <span class="text-sm font-black text-slate-800">{{ $phpMemoryLimit }}</span>
                 </div>
-                <div class="card-body">
-                    <p>PHP Memory Limit:
-                        <b>{{ $phpMemoryLimit }}</b>
-                    </p>
-                    <p>Max Execution Time:
-                        <b>{{ $maxExecution }} seconds</b>
-                    </p>
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Max Execution Time</span>
+                    <span class="text-sm font-black text-slate-800">{{ $maxExecution }} <small class="text-slate-400">sec</small></span>
                 </div>
             </div>
         </div>
 
         {{-- ======================= DATABASE PERFORMANCE ======================= --}}
-        <div class="col-xl-6 col-md-6 mt-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Database Performance</h5>
+        @php
+            $dbStatus = match(true) {
+                $dbResponse >= 500 => ['color' => 'rose', 'text' => 'Critical Delay'],
+                $dbResponse >= 200 => ['color' => 'amber', 'text' => 'Slow Query'],
+                default => ['color' => 'emerald', 'text' => 'Fast'],
+            };
+        @endphp
+        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
+            <div class="absolute -right-10 -bottom-10 size-32 bg-{{ $dbStatus['color'] }}-50 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+            
+            <h5 class="text-xs font-black text-slate-900 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                <i class="ri-database-2-line text-{{ $dbStatus['color'] }}-500"></i>
+                Database Latency
+            </h5>
+
+            <div class="relative z-10 flex items-end justify-between">
+                <div>
+                    <h4 class="text-5xl font-black text-slate-900 tracking-tighter italic">
+                        {{ $dbResponse }}<span class="text-lg text-slate-400 font-medium italic ml-1">ms</span>
+                    </h4>
+                    <span class="mt-2 inline-block px-2 py-1 bg-{{ $dbStatus['color'] }}-50 text-{{ $dbStatus['color'] }}-600 rounded text-[9px] font-black uppercase tracking-widest">
+                        {{ $dbStatus['text'] }}
+                    </span>
                 </div>
-                <div class="card-body">
-
-                    @php
-                        $dbStatus = 'success';
-                        $dbText = 'Fast';
-
-                        if ($dbResponse >= 200) {
-                            $dbStatus = 'warning';
-                            $dbText = 'Slow Query';
-                        }
-                        if ($dbResponse >= 500) {
-                            $dbStatus = 'danger';
-                            $dbText = 'Critical Delay';
-                        }
-                    @endphp
-
-                    <h4>{{ $dbResponse }} ms</h4>
-                    <span class="badge bg-{{ $dbStatus }}">{{ $dbText }}</span>
-
-                    <small class="text-muted d-block mt-2">
-                        Ini gambaran kecepatan query sederhana pada DB.
-                    </small>
+                <div class="text-right">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase leading-relaxed max-w-[120px]">
+                        Kecepatan eksekusi query pada database.
+                    </p>
                 </div>
             </div>
         </div>

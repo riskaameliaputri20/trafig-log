@@ -1,6 +1,234 @@
 @use('Carbon\Carbon')
+<x-layouts.dashboard title="User Behavior Analysis">
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div
+            class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4 group">
+            <div
+                class="size-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110">
+                <i class="ri-fingerprint-line text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Unique
+                    Visitors</p>
+                <h4 class="text-2xl font-black text-slate-900 leading-tight">
+                    {{ number_format($userBehavior->count()) }}</h4>
+            </div>
+        </div>
+
+        <div
+            class="bg-slate-900 p-6 rounded-3xl shadow-xl flex items-center gap-4 border-l-4 border-emerald-500">
+            <div
+                class="size-12 bg-white/10 text-emerald-400 rounded-2xl flex items-center justify-center">
+                <i class="ri-user-location-line text-2xl"></i>
+            </div>
+            <div class="min-w-0">
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Top
+                    Active Source</p>
+                <h4 class="text-lg font-mono font-black text-white truncate leading-tight">
+                    {{ $userBehavior->first()['ip_address'] ?? 'N/A' }}
+                </h4>
+            </div>
+        </div>
+
+        <div
+            class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4">
+            <div
+                class="size-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center">
+                <i class="ri-shield-user-line text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Health
+                    Status</p>
+                <h4 class="text-lg font-black text-emerald-600 italic uppercase">Secure Traffic</h4>
+            </div>
+        </div>
+    </div>
+
+    <div
+        class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden mb-8"
+        x-data="{ detailOpen: false, activeUser: null }"
+    >
+        <div
+            class="p-6 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <h5 class="text-sm font-black text-slate-900 uppercase tracking-[0.2em]">Detailed
+                    User Behavior</h5>
+                <p
+                    class="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-widest italic">
+                    Session & Clickstream Analysis</p>
+            </div>
+            <a
+                href="{{ route('dashboard.export.user-behavior') }}"
+                class="px-4 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-lg hover:bg-emerald-700 transition-all flex items-center gap-2"
+            >
+                <i class="ri-file-chart-line"></i> Export Analysis
+            </a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left whitespace-nowrap">
+                <thead>
+                    <tr
+                        class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                        <th class="px-6 py-4">IP Address</th>
+                        <th class="px-6 py-4 text-center">Hits</th>
+                        <th class="px-6 py-4">Duration</th>
+                        <th class="px-6 py-4">Avg Gap</th>
+                        <th class="px-6 py-4">Type</th>
+                        <th class="px-6 py-4">Entry / Exit</th>
+                        <th class="px-6 py-4 text-right">Activity</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($userBehavior as $user)
+                        <tr
+                            class="hover:bg-slate-50/50 transition-colors group text-xs font-medium text-slate-600">
+                            <td class="px-6 py-4">
+                                <span
+                                    class="font-mono font-black text-slate-900">{{ $user['ip_address'] }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span
+                                    class="font-black text-slate-800">{{ $user['total_requests'] }}</span>
+                            </td>
+                            <td class="px-6 py-4 italic">
+                                @php
+                                    $durationDisplay = '-';
+                                    if ($user['duration_minutes'] > 0) {
+                                        $durationDisplay = Carbon::parse(
+                                            $user['first_seen'],
+                                        )->diffForHumans(Carbon::parse($user['last_seen']), [
+                                            'parts' => 1,
+                                            'short' => true,
+                                            'syntax' => Carbon::DIFF_ABSOLUTE,
+                                        ]);
+                                    }
+                                @endphp
+                                {{ $durationDisplay }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-bold">{{ $user['avg_click_gap_sec'] }}s</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if ($user['behavior_type'] === 'possible bot / crawler')
+                                    <span
+                                        class="px-2 py-1 bg-rose-50 text-rose-600 rounded-lg text-[9px] font-black uppercase tracking-tighter border border-rose-100"
+                                    >Bot / Crawler</span>
+                                @elseif ($user['behavior_type'] === 'high activity user')
+                                    <span
+                                        class="px-2 py-1 bg-amber-50 text-amber-600 rounded-lg text-[9px] font-black uppercase tracking-tighter border border-amber-100"
+                                    >High Active</span>
+                                @else
+                                    <span
+                                        class="px-2 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[9px] font-black uppercase tracking-tighter border border-emerald-100"
+                                    >Normal</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col gap-1 max-w-[150px]">
+                                    <span class="truncate text-[10px] text-slate-400">In:
+                                        {{ $user['first_page'] }}</span>
+                                    <span class="truncate text-[10px] text-slate-800 font-bold">Out:
+                                        {{ $user['last_page'] }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button
+                                    @click="activeUser = {{ json_encode($user) }}; detailOpen = true"
+                                    class="px-3 py-1 bg-slate-900 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-sm"
+                                >
+                                    Clickstream
+                                </button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td
+                                colspan="7"
+                                class="px-6 py-12 text-center text-slate-400 italic"
+                            >No user behavior data available.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div
+            x-show="detailOpen"
+            class="fixed inset-0 z-[70]"
+            x-cloak
+        >
+            <div
+                x-show="detailOpen"
+                x-transition.opacity
+                @click="detailOpen = false"
+                class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+            ></div>
+            <div
+                x-show="detailOpen"
+                x-transition:enter="transition ease-out duration-300 transform"
+                x-transition:enter-start="translate-x-full"
+                x-transition:enter-end="translate-x-0"
+                class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl flex flex-col"
+            >
+
+                <div class="p-6 bg-slate-900 text-white flex justify-between items-center">
+                    <div>
+                        <h3 class="text-sm font-black uppercase tracking-widest italic">User
+                            Clickstream</h3>
+                        <p
+                            class="text-[10px] text-emerald-400 font-mono mt-1"
+                            x-text="activeUser?.ip_address"
+                        ></p>
+                    </div>
+                    <button
+                        @click="detailOpen = false"
+                        class="p-2 hover:bg-white/10 rounded-xl transition-colors"
+                    ><i class="ri-close-line text-2xl"></i></button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-8 custom-scrollbar bg-slate-50/50">
+                    <template x-if="activeUser">
+                        <div class="relative border-l-2 border-emerald-200 ml-3 space-y-8">
+                            <template x-for="(page, index) in activeUser.clickstream.split(' , ')">
+                                <div class="relative pl-8">
+                                    <div
+                                        class="absolute -left-[9px] top-1 size-4 rounded-full bg-white border-4 border-emerald-500 shadow-sm">
+                                    </div>
+                                    <p
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"
+                                        x-text="'Step ' + (index + 1)"
+                                    ></p>
+                                    <div
+                                        class="p-3 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                                        <code
+                                            class="text-[10px] text-slate-700 break-all leading-relaxed"
+                                            x-text="page"
+                                        ></code>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-sm font-black text-slate-900 uppercase tracking-[0.2em]">Activity
+                Distribution</h3>
+        </div>
+        <div
+            id="userBehaviorChart"
+            class="w-full"
+            style="min-height: 365px;"
+        ></div>
+    </div>
 @push('script')
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var options = {
@@ -11,14 +239,16 @@
                 chart: {
                     type: 'bar',
                     height: 350,
+                    fontFamily: 'Inter',
                     toolbar: {
-                        show: true
+                        show: false
                     }
                 },
                 plotOptions: {
                     bar: {
-                        borderRadius: 5,
+                        borderRadius: 12,
                         horizontal: false,
+                        columnWidth: '40%',
                         distributed: true
                     }
                 },
@@ -27,173 +257,38 @@
                 },
                 xaxis: {
                     categories: @json($userBehavior->pluck('ip_address')),
-                    title: {
-                        text: 'IP Address'
-                    }
+                    labels: {
+                        show: false
+                    } // Hide IP labels for cleaner look as they are long
                 },
                 yaxis: {
-                    title: {
-                        text: 'Jumlah Request'
+                    labels: {
+                        style: {
+                            colors: '#94a3b8',
+                            fontSize: '10px',
+                            fontWeight: 600
+                        }
                     }
                 },
-                colors: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444'],
-                title: {
-                    text: 'Aktivitas Pengguna Berdasarkan Jumlah Request',
-                    align: 'left'
+                colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#6366f1'],
+                grid: {
+                    borderColor: '#f1f5f9',
+                    strokeDashArray: 4
                 },
                 tooltip: {
+                    theme: 'dark',
                     y: {
-                        formatter: (val) => val + " request"
+                        formatter: (val) => val + " requests"
                     }
+                },
+                legend: {
+                    show: false
                 }
             };
-
-            var chart = new ApexCharts(document.querySelector("#userBehaviorChart"), options);
-            chart.render();
+            
+            new ApexCharts(document.querySelector("#userBehaviorChart"), options).render();
         });
     </script>
 @endpush
-<x-layouts.dashboard>
-    <!-- 🔹 Summary Section -->
-    <div class="row">
-        <div class="col-xl-3 col-md-6">
-            <div class="card mini-stats-wid">
-                <div class="card-body">
-                    <div class="d-flex">
-                        <div class="flex-grow-1">
-                            <p class="text-muted fw-medium mb-2">Total Unique IPs</p>
-                            <h4 class="mb-0">{{ $userBehavior->count() }}</h4>
-                        </div>
-                        <div class="avatar-sm flex-shrink-0">
-                            <span class="avatar-title bg-primary rounded-circle fs-4">
-                                <i class="ri-computer-line"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-xl-3 col-md-6">
-            <div class="card mini-stats-wid">
-                <div class="card-body">
-                    <div class="d-flex">
-                        <div class="flex-grow-1">
-                            <p class="text-muted fw-medium mb-2">Top Active IP</p>
-                            <h4 class="mb-0">
-                                {{ $userBehavior->first()['ip_address'] ?? '-' }}
-                            </h4>
-                        </div>
-                        <div class="avatar-sm flex-shrink-0">
-                            <span class="avatar-title bg-success rounded-circle fs-4">
-                                <i class="ri-user-location-line"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- 🔹 Main Table -->
-    <div class="row">
-        <div class="col-xl-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center bg-light">
-                    <h5 class="card-title mb-0">Detailed User Behavior</h5>
-                    <a href="{{ route('dashboard.export.user-behavior') }}" class="btn btn-success">
-                        Export Laporan
-                    </a>
-                </div>
-                <h5 class="card-title mb-0">Detailed User Behavior</h5>
-            </div>
-
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle mb-0">
-                        <thead class="table-light text-nowrap">
-                            <tr>
-                                <th>IP Address</th>
-                                <th>Requests</th>
-                                <th>Duration (min)</th>
-                                <th>Avg Click Gap (s)</th>
-                                <th>Behavior Type</th>
-                                <th>First Page</th>
-                                <th>Last Page</th>
-                                <th>Clickstream</th>
-                                <th>First Seen</th>
-                                <th>Last Seen</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($userBehavior as $user)
-                                <tr>
-                                    <td><span class="fw-medium">{{ $user['ip_address'] }}</span></td>
-                                    <td>{{ $user['total_requests'] }}</td>
-                                    <td>
-                                        @php
-                                            $durationDisplay = '-';
-                                            if ($user['duration_minutes'] > 0) {
-                                                $start = Carbon::parse($user['first_seen']);
-                                                $end = Carbon::parse($user['last_seen']);
-                                                $durationDisplay = $start->diffForHumans($end, [
-                                                    'parts' => 2,
-                                                    'short' => false,
-                                                    'syntax' => Carbon::DIFF_ABSOLUTE,
-                                                ]);
-                                            }
-                                        @endphp
-                                        {{ $durationDisplay }}
-                                    </td>
-                                    <td>{{ $user['avg_click_gap_sec'] }}</td>
-                                    <td>
-                                        @if ($user['behavior_type'] === 'possible bot / crawler')
-                                            <span class="badge bg-danger">Crawler / Bot</span>
-                                        @elseif ($user['behavior_type'] === 'high activity user')
-                                            <span class="badge bg-warning text-dark">High Activity</span>
-                                        @else
-                                            <span class="badge bg-success">Normal</span>
-                                        @endif
-                                    </td>
-                                    <td><code>{{ Str::limit($user['first_page'], 40) }}</code></td>
-                                    <td><code>{{ Str::limit($user['last_page'], 40) }}</code></td>
-                                    <td style="max-width: 300px;">
-                                        <small class="text-muted d-block text-truncate"
-                                            title="{{ $user['clickstream'] }}">
-                                            {{ Str::limit($user['clickstream'], 100) }}
-                                        </small>
-                                    </td>
-                                    <td>{{ $user['first_seen']->format('d M Y H:i') }}</td>
-                                    <td>{{ $user['last_seen']->format('d M Y H:i') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="10" class="text-center text-muted py-4">
-                                        <i class="ri-information-line me-1"></i>
-                                        No user behavior data available.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
-
-    <!-- 🔹 Chart -->
-    <div class="row mt-4">
-        <div class="col-xl-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">User Request Activity Chart</h5>
-                </div>
-                <div class="card-body">
-                    <div id="userBehaviorChart" class="apex-charts" style="min-height: 350px;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 </x-layouts.dashboard>
