@@ -114,6 +114,12 @@
                          <span>Popular Endpoint</span>
                      </a>
                  </li>
+                 <li class="menu-title"><span data-key="t-menu">Settings</span></li>
+                 <li class="nav-item">
+                     <a class="nav-link menu-link" href="{{ route('dashboard.setting.account') }}">
+                         <i class="ri-settings-line"></i> <span>Account</span>
+                     </a>
+                 </li>
 
              </ul>
          </div>

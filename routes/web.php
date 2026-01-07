@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
@@ -45,6 +46,10 @@ Route::prefix('beranda')->middleware('auth')->name('dashboard.')->group(function
     Route::get('/export/error-logs', [ExportController::class, 'exportErrorLogs'])->name('export.error-logs');
     Route::get('/export/user-behavior', [ExportController::class, 'exportUserBehavior'])->name('export.user-behavior');
     Route::get('/export/login-activity', [ExportController::class, 'exportLoginActivity'])->name('export.login-activity');
+
+    Route::get('/setting/account', [SettingController::class, 'account'])->name('setting.account');
+    Route::post('/setting/account', [SettingController::class, 'accountUpdate'])->name('setting.account.update');
+
 
 });
 
