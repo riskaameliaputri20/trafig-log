@@ -1,9 +1,20 @@
+// resources/js/app.js
+
+// 1. Import Bootstrap (Biasanya berisi Axios untuk request API)
 import './bootstrap';
 
-import Alpine from 'alpinejs'
+// 2. Import jQuery & Daftarkan Global
+// Penting: Lakukan ini sebelum library lain yang butuh jQuery
+import $ from 'jquery';
+window.$ = window.jQuery = $;
 
-// Menjadikan Alpine tersedia secara global (opsional, tapi disarankan)
-window.Alpine = Alpine
+// 3. Import ApexCharts & Daftarkan Global
+import ApexCharts from 'apexcharts';
+window.ApexCharts = ApexCharts;
 
-// Memulai Alpine
-Alpine.start()
+// 4. Import Alpine.js & Inisialisasi
+import Alpine from 'alpinejs';
+window.Alpine = Alpine;
+Alpine.start();
+
+console.log('🚀 LogScreen Riska: All systems active!');

@@ -29,7 +29,9 @@ class DatabaseSeeder extends Seeder
         $count = (int) $this->command->ask('Jumlah Blog yang ingin dibuat?', 10);
 
         $this->command->info("Membuat {$count} Blog...");
-
+        if(!BlogCategory::count() > 0){
+            BlogCategory::factory(10);
+        }
         // Progress Bar
         $this->command->withProgressBar(range(1, $count), function () {
             Blog::factory()->create();

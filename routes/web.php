@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\Admin\BlogController as DashboardBlogController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
@@ -17,16 +19,10 @@ Route::middleware('guest')->group(function () {
 Route::any('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 // Landing Page
-Route::name('landing.')->group(function () {
-
-    Route::get('/', [LandingController::class, 'index'])->name('index');
-    // produk
-    Route::get('/products', [ProductController::class, 'index'])->name('product');
-    // blog
-    Route::get('/blogs', [BlogController::class, 'index'])->name('blog');
-    Route::get('/blogs/category/{name}', [BlogController::class, 'category'])->name('blog.category');
-    Route::get('/blogs/{slug}', [BlogController::class, 'detail'])->name('blog.detail');
-});
+Route::get('/', [LandingController::class, 'index'])->name('landing.index');
+Route::get('/features', [LandingController::class, 'features'])->name('landing.features');
+Route::get('/about', [LandingController::class, 'about'])->name('landing.about');
+Route::get('/blog/{blog:slug}', [LandingController::class, 'show'])->name('landing.show');
 
 // Dashboard Page
 Route::prefix('beranda')->middleware('auth')->name('dashboard.')->group(function () {
@@ -50,7 +46,9 @@ Route::prefix('beranda')->middleware('auth')->name('dashboard.')->group(function
     Route::get('/setting/account', [SettingController::class, 'account'])->name('setting.account');
     Route::post('/setting/account', [SettingController::class, 'accountUpdate'])->name('setting.account.update');
 
+    Route::resource('blog', DashboardBlogController::class);
 
+    Route::resource('category', CategoryController::class);
 });
 
 

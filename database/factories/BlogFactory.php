@@ -22,7 +22,7 @@ class BlogFactory extends Factory
             'description'  => fake()->paragraph(),     // Deskripsi acak
             'content'      => fake()->text(1500),
         'thumbnail'    => 'https://placehold.co/600x400?text=Thumbnail',
-            'blog_category_id'  => BlogCategory::inRandomOrder()->first()?->id ?? BlogCategory::factory(),
+            'blog_category_id'  => BlogCategory::inRandomOrder()->value('id'),
         ];
     }
 }

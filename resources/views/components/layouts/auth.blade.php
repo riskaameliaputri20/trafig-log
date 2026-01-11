@@ -13,21 +13,15 @@
     >
 
     @vite(['resources/css/app.css','resources/js/app.js'])
-
+    <x-link
+        rel="shortcut icon"
+        href="{{ asset('favicon.ico') }}"
+    />
     <x-link
         rel="shortcut icon"
         href="dashboard/assets/images/favicon.ico"
     />
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
-
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
 
         .auth-gradient {
             background: linear-gradient(135deg, #405189 0%, #0ab39c 100%);
